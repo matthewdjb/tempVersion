@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="com.xiting.tempVersion.LaunchShortcut"
+            id="com.xiting.temptp.shortcut"
+            label="Create temporary version"
+            modes="run">   
+                 <contextualLaunch>
+            <enablement>
+               <reference
+                     definitionId="com.sap.adt.atc.ui.isCheckableByAtc">
+               </reference>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.xiting.tempVersion.preferences.TempVersionPreferences"
+            id="com.xiting.tempVersion.tempVersion"
+            name="Temporary Versioning">
+      </page>
+      <page
+            category="com.xiting.tempVersion.tempVersion"
+            class="com.xiting.tempVersion.preferences.FMNamePreference"
+            id="com.xiting.tempVersion.fmname"
+            name="Function Module Name">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.xiting.tempVersion.preferences.PreferenceInitialiser">
+      </initializer>
+   </extension>
+</plugin>
