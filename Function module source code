@@ -1,0 +1,60 @@
+FUNCTION Z_SVRS_AFTER_CHANGED_ONLINE
+  IMPORTING
+    VALUE(E071_ENTRY) LIKE E071
+    VALUE(STATUS) LIKE D010SINF-R3STATE DEFAULT 'A'
+  EXPORTING
+    VALUE(VERSION_NEW) LIKE VRSD-VERSNO
+    VALUE(RETURN) TYPE BAPIRET2
+    VALUE(FAILED) TYPE FLAG.
+
+
+
+  CALL FUNCTION 'SVRS_AFTER_CHANGED_ONLINE_NEW'
+    EXPORTING
+      e071_entry              = e071_entry  " Table E071 entry
+      status                  = status
+    IMPORTING
+      version_new             = version_new
+    EXCEPTIONS
+      non_versionable_objtype = 1
+      no_tadir_entry          = 2
+      object_not_found        = 3
+      object_not_locked       = 4
+      OTHERS                  = 5.
+
+  IF sy-subrc <> 0.
+    e071_entry-pgmid = SWITCH #( e071_entry-pgmid WHEN 'R3TR' THEN 'LIMU'
+                                                  ELSE 'R3TR' ).
+    IF e071_entry-object EQ 'PROG'.
+      e071_entry-object = 'REPS'.
+    ELSEIF e071_entry-object EQ 'REPS'.
+      e071_entry-object = 'PROG'.
+    ENDIF.
+    CALL FUNCTION 'SVRS_AFTER_CHANGED_ONLINE_NEW'
+      EXPORTING
+        e071_entry              = e071_entry  " Table E071 entry
+        status                  = status
+      IMPORTING
+        version_new             = version_new
+      EXCEPTIONS
+        non_versionable_objtype = 1
+        no_tadir_entry          = 2
+        object_not_found        = 3
+        object_not_locked       = 4
+        OTHERS                  = 5.
+    IF sy-subrc <> 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4 INTO return-message.
+      return-id = sy-msgid.
+      return-type = sy-msgty.
+      return-number = sy-msgno.
+      return-message_v1 = sy-msgv1.
+      return-message_v2 = sy-msgv2.
+      return-message_v3 = sy-msgv3.
+      return-message_v4 = sy-msgv4.
+      failed = abap_true.
+    ENDIF.
+  ENDIF.
+
+
+ENDFUNCTION.
